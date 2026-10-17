@@ -1,0 +1,47 @@
+{
+    "schemaVersion": 1,
+    "id": "keyed-bundles",
+    "version": "${version}",
+    "name": "Keyed Bundles",
+    "description": "Cycle through the items inside a bundle with keyboard keys.",
+    "authors": [
+        {
+            "name": "SEG",
+            "contact": {
+                "homepage": "https://github.com/segdv"
+            }
+        }
+    ],
+    "contact": {
+        "issues": "https://github.com/segdv/keyed-bundles/issues",
+        "sources": "https://github.com/segdv/keyed-bundles",
+        "discord": "https://discord.gg/28WTtvgDEt"
+    },
+    "license": "AGPL-3.0-only",
+    "icon": "assets/keyed-bundles/icon.png",
+    "environment": "client",
+    "entrypoints": {
+        "client": [
+            "io.github.segdv.keyedbundles.client.KeyedBundlesClient"
+        ]
+    },
+    "mixins": [
+        {
+            "config": "keyed-bundles.client.mixins.json",
+            "environment": "client"
+        }
+    ],
+    "depends": {
+        "fabricloader": ">=0.19.5",
+        "minecraft": "~1.21.2",
+        "java": ">=21",
+        "fabric-api": "*"
+    },
+    "custom": {
+        "modmenu": {
+            "links": {
+                "modmenu.discord": "https://discord.gg/28WTtvgDEt"
+            }
+        }
+    }
+}
