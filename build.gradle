@@ -1,13 +1,23 @@
 plugins {
-    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}"
-    id 'maven-publish'
+    id 'net.fabricmc.fabric-loom-remap' version "${loom_version}" apply false
+    id 'net.fabricmc.fabric-loom' version "${loom_version}" apply false
 }
+
+def unobfuscated = sc.current.parsed.matches('>=26.1')
+apply plugin: unobfuscated ? 'net.fabricmc.fabric-loom' : 'net.fabricmc.fabric-loom-remap'
 
 def minecraftVersion = property('minecraft_version')
 def fabricApiVersion = property('fabric_api_version')
 def modVersion = property('version')
+def javaVersion = unobfuscated ? 25 : 21
+def javaCompatibility = "JAVA_${javaVersion}"
+def javaDependency = ">=${javaVersion}"
 
 version = "${modVersion}+${sc.current.version}"
+
+base {
+    archivesName = "keyed-bundles"
+}
 
 repositories {
     // Add repositories to retrieve artifacts from in here.
@@ -28,27 +38,40 @@ loom {
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${minecraftVersion}"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${property('loader_version')}"
 
-    // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+    if (!unobfuscated) {
+        mappings loom.officialMojangMappings()
+    }
+
+    if (unobfuscated) {
+        implementation "net.fabricmc:fabric-loader:${property('loader_version')}"
+        implementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+    } else {
+        modImplementation "net.fabricmc:fabric-loader:${property('loader_version')}"
+        modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+    }
 }
 
 def resourceVersion = version.toString()
-def resourceMinecraft = "~${minecraftVersion}"
+def resourceMinecraft = property('minecraft_dependency')
 
 processResources {
     inputs.property "version", resourceVersion
     inputs.property "minecraft", resourceMinecraft
+    inputs.property "java", javaDependency
+    inputs.property "java_compatibility", javaCompatibility
 
     filesMatching("fabric.mod.json") {
-        expand "version": resourceVersion, "minecraft": resourceMinecraft
+        expand "version": resourceVersion, "minecraft": resourceMinecraft, "java": javaDependency
+    }
+
+    filesMatching("*.mixins.json") {
+        expand "java_compatibility": javaCompatibility
     }
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.release = 21
+    it.options.release = javaVersion
 }
 
 java {
@@ -57,8 +80,8 @@ java {
     // If you remove this line, sources will not be generated.
     withSourcesJar()
 
-    sourceCompatibility = JavaVersion.VERSION_21
-    targetCompatibility = JavaVersion.VERSION_21
+    sourceCompatibility = JavaVersion.toVersion(javaVersion)
+    targetCompatibility = JavaVersion.toVersion(javaVersion)
 }
 
 jar {
@@ -67,22 +90,5 @@ jar {
 
     from("LICENSE") {
         rename { "${it}_$projectName"}
-    }
-}
-
-// configure the maven publication
-publishing {
-    publications {
-        create("mavenJava", MavenPublication) {
-            from components.java
-        }
-    }
-
-    // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
-    repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
     }
 }
