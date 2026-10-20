@@ -9,4 +9,18 @@ pluginManagement {
     }
 }
 
+plugins {
+    id 'dev.kikugie.stonecutter' version '0.9.8'
+}
+
+stonecutter {
+    kotlinController = false
+    centralScript = 'build.gradle'
+
+    create(getRootProject()) {
+        versions '1.21.2', '1.21.9'
+        vcsVersion = '1.21.2'
+    }
+}
+
 rootProject.name = 'keyed-bundles'

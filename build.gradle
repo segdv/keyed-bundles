@@ -3,6 +3,12 @@ plugins {
     id 'maven-publish'
 }
 
+def minecraftVersion = property('minecraft_version')
+def fabricApiVersion = property('fabric_api_version')
+def modVersion = property('version')
+
+version = "${modVersion}+${sc.current.version}"
+
 repositories {
     // Add repositories to retrieve artifacts from in here.
     // You should only use this when depending on other mods because
@@ -21,20 +27,23 @@ loom {
 
 dependencies {
     // To change the versions see the gradle.properties file
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc:fabric-loader:${property('loader_version')}"
 
     // Fabric API. This is technically optional, but you probably want it anyway.
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
 }
 
+def resourceVersion = version.toString()
+def resourceMinecraft = "~${minecraftVersion}"
+
 processResources {
-    def version = project.version
-    inputs.property "version", version
+    inputs.property "version", resourceVersion
+    inputs.property "minecraft", resourceMinecraft
 
     filesMatching("fabric.mod.json") {
-        expand "version": version
+        expand "version": resourceVersion, "minecraft": resourceMinecraft
     }
 }
 

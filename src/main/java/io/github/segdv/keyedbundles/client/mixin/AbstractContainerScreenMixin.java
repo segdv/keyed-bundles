@@ -8,6 +8,10 @@ import net.minecraft.client.gui.ItemSlotMouseAction;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.Slot;
 
+//? if >=1.21.9 {
+/*import net.minecraft.client.input.KeyEvent;
+*///?}
+
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,24 +28,29 @@ public abstract class AbstractContainerScreenMixin {
     @Final
     private List<ItemSlotMouseAction> itemSlotMouseActions;
 
+    //? if >=1.21.9 {
+    /*@Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
+    private void keyedBundles$cycleBundleItem(KeyEvent event, CallbackInfoReturnable<Boolean> cir) {
+        if (Keybinds.nextItem != null && Keybinds.nextItem.matches(event)) {
+            keyedBundles$scroll(-1.0, cir);
+        } else if (Keybinds.previousItem != null && Keybinds.previousItem.matches(event)) {
+            keyedBundles$scroll(1.0, cir);
+        }
+    }
+    *///?} else {
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
     private void keyedBundles$cycleBundleItem(int keyCode, int scanCode, int modifiers,
             CallbackInfoReturnable<Boolean> cir) {
-
-        if (this.hoveredSlot == null || !this.hoveredSlot.hasItem()) {
-            return;
-        }
-
-        final double scroll;
-        final double nextItemScroll = -1.0;
-        final double previousItemScroll = 1.0;
-
         if (Keybinds.nextItem != null && Keybinds.nextItem.matches(keyCode, scanCode)) {
-            scroll = nextItemScroll;
-        } else if (Keybinds.previousItem != null
-                && Keybinds.previousItem.matches(keyCode, scanCode)) {
-            scroll = previousItemScroll;
-        } else {
+            keyedBundles$scroll(-1.0, cir);
+        } else if (Keybinds.previousItem != null && Keybinds.previousItem.matches(keyCode, scanCode)) {
+            keyedBundles$scroll(1.0, cir);
+        }
+    }
+    //?}
+
+    private void keyedBundles$scroll(double scroll, CallbackInfoReturnable<Boolean> cir) {
+        if (this.hoveredSlot == null || !this.hoveredSlot.hasItem()) {
             return;
         }
 

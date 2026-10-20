@@ -6,7 +6,12 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 
 public class Keybinds {
-    public static String CATEGORY = "key.category.keyed-bundles";
+    //? if >=1.21.9 {
+    /*public static final KeyMapping.Category CATEGORY = KeyMapping.Category.register(
+            net.minecraft.resources.ResourceLocation.fromNamespaceAndPath("keyed-bundles", "main"));
+    *///?} else {
+    public static final String CATEGORY = "key.category.keyed-bundles.main";
+    //?}
 
     public static KeyMapping nextItem;
     public static KeyMapping previousItem;
