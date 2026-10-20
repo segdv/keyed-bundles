@@ -1,6 +1,5 @@
 package io.github.segdv.keyedbundles.client;
 
-import org.lwjgl.glfw.GLFW;
 import com.mojang.blaze3d.platform.InputConstants;
 
 //? if >=26.1 {
@@ -27,10 +26,18 @@ public class Keybinds {
 
     public static void register() {
         nextItem = registerMapping(new KeyMapping("key.keyed-bundles.next_item",
-                InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_RIGHT, CATEGORY));
+                inputType(), InputConstants.KEY_RIGHT, CATEGORY));
 
         previousItem = registerMapping(new KeyMapping("key.keyed-bundles.previous_item",
-                InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT, CATEGORY));
+                inputType(), InputConstants.KEY_LEFT, CATEGORY));
+    }
+
+    private static InputConstants.Type inputType() {
+        //? if >=26.3 {
+        /*return InputConstants.Type.KEYBOARD;
+        *///?} else {
+        return InputConstants.Type.KEYSYM;
+        //?}
     }
 
     private static KeyMapping registerMapping(KeyMapping mapping) {
